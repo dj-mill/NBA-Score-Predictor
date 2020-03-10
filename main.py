@@ -15,7 +15,7 @@ while x == 0:
         continue
       away_season = project.webpage(away_team)
       away_record, away_scored, away_allowed = project.simple_stats(away_season, "away")
-      print(away_record, "\nPTS/G: " + "Record:", str(away_scored) + " \nOPTS/G: " + str(away_allowed)) 
+      print("Record:" + str(away_record) + "\nPTS/G: " + str(away_scored) + " \nOPTS/G: " + str(away_allowed)) 
 
       while z == 0:
         home_team = input("Home: ")
@@ -25,7 +25,7 @@ while x == 0:
           continue
         home_season = project.webpage(home_team)
         home_record, home_scored, home_allowed = project.simple_stats(home_season, "home")
-        print(home_record, "\nPTS/G: " + str(home_scored) + " \nOPTS/G: " + str(home_allowed))
+        print("Record:" + str(home_record) + "\nPTS/G: " + str(home_scored) + " \nOPTS/G: " + str(home_allowed))
         break
 
       project.results(away_team, away_season, away_record, away_scored, away_allowed, home_team, home_season, home_record, home_scored, home_allowed)
