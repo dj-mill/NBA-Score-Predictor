@@ -1,7 +1,7 @@
 import statistics
 import random
 import bs4
-from urllib.request import urlopen as uReq
+from urllib.request import urlopen as u_req
 from bs4 import BeautifulSoup as soup
 
 # league_average is NBA average of points in a game
@@ -9,7 +9,7 @@ league_average = 111.3
 # sample size being examined, 15 = past 15 home or away games for team
 sample = 15
 
-#checks if team name is in NBA
+#checks if team name is in the NBA dictionary
 def team_check(team):
   if team != "76ers":
       team = team.lower().title()
@@ -22,9 +22,9 @@ def team_check(team):
 def webpage(team):
   team_games = "https://www.basketball-reference.com/teams/" + NBA[team] + "/2020_games.html"
 
-  uClient = uReq(team_games)
-  team_page = uClient.read()
-  uClient.close()
+  u_client = u_req(team_games)
+  team_page = u_client.read()
+  u_client.close()
 
   team_soup = soup(team_page, "html.parser")
   season = team_soup.findAll("tr")
@@ -145,39 +145,32 @@ def final_stats(max_away, min_away, max_home, min_home):
   if home_wins == 100.0 or away_wins == 100.0:
     home_wins -= 0.1
     away_wins -= 0.1
+    print
   return away_final_score, home_final_score, away_wins, home_wins
-#adjusts each teams scoring and formats the outputted results
+#adjusts each teams scoring and formats the outputted results into two lists
 def results(away_team, away_season, away_record, away_scored, away_allowed, home_team, home_season, home_record, home_scored, home_allowed):
   away_adjust = home_allowed / league_average
-  away_scored = round(away_scored * away_adjust)
+  away_adjusted = round(away_scored * away_adjust)
 
   home_adjust = away_allowed / league_average
-  home_scored = round(home_scored * home_adjust)
+  home_adjusted = round(home_scored * home_adjust)
 
   away_se = standard_error(away_season, "away")      
   home_se = standard_error(home_season, "home")
 
-  max_points_away, min_points_away = interval(away_scored, away_se)
+  max_points_away, min_points_away = interval(away_adjusted, away_se)
+  max_points_home, min_points_home = interval(home_adjusted, home_se)
 
-  max_points_home, min_points_home = interval(home_scored, home_se)
-  print(away_team + " CI:(" + str(min_points_away) + "-" + str(max_points_away) + ")")
-  print(home_team + " CI:(" + str(min_points_home) + "-" + str(max_points_home) + ")")
+  away_CI = "(" + str(min_points_away) + "-" + str(max_points_away) + ")"
+  home_CI = "(" + str(min_points_home) + "-" + str(max_points_home) + ")"
+  
   away_final_score, home_final_score, away_wins, home_wins = final_stats(int(max_points_away), int(min_points_away), int(max_points_home), int(min_points_home))
 
-  if away_wins > home_wins:
-    print("The " + away_team + " have a " + str(away_wins) + "% chance of winning")
-  else:
-    print("The " + home_team + " have a " + str(home_wins) + "% chance of winning")
-  if away_final_score == home_final_score:
-    if away_wins > home_wins:
-      away_final_score += 1
-    else:
-      home_final_score += 1
+  away_info = [away_team, away_record, away_scored,away_allowed, away_CI, away_wins, away_final_score]
+  home_info = [home_team, home_record, home_scored,home_allowed, home_CI, home_wins, home_final_score]
+  return away_info, home_info
 
-  print("Predicted Score: " + away_team + "-" + str(away_final_score) + " " + home_team + "-" + str(home_final_score) + "\n")
-  return
-
-#dictionary that converts each team's name into suitable format so that the team's url can be accessed
+# Turns team names into a form that will allow their team website to be accessed
 NBA = {
   "Hawks": "ATL",
   "Celtics": "BOS",
