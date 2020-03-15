@@ -10,9 +10,9 @@ def todays_games(update):
   #creates a new csv
   if update == True:      
     games = 'https://www.cbssports.com/nba/scoreboard/'
-    uClient = opener(games)
-    todays_games = uClient.read()
-    uClient.close()
+    u_client = opener(games)
+    todays_games = u_client.read()
+    u_client.close()
 
     todays_soup = soup(todays_games, "html.parser")
     team_names = todays_soup.findAll("a", {"class": "team"})
